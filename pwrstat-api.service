@@ -6,8 +6,9 @@ Wants=pwrstatd.service
 
 [Service]
 Type=simple
-User=pwrstat-api
-Group=pwrstat-api
+# Runs as root: pwrstatd only permits root access to its IPC socket.
+User=root
+Group=root
 
 ExecStart=/opt/pwrstat-api/.venv/bin/pwrstat-api
 Restart=on-failure
@@ -20,10 +21,7 @@ Environment=LOG_LEVEL=info
 
 # Security hardening
 NoNewPrivileges=true
-ProtectSystem=full
-ProtectHome=true
 PrivateTmp=true
-# pwrstat communicates with pwrstatd via a socket — no direct device access needed
 PrivateDevices=true
 
 [Install]
