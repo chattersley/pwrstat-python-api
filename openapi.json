@@ -1,0 +1,116 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "pwrstat API",
+    "description": "REST API for CyberPower UPS status via pwrstat",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/pwrstat": {
+      "get": {
+        "summary": "UPS status",
+        "description": "Returns the current UPS status as reported by `pwrstat -status`.",
+        "operationId": "get_pwrstat",
+        "responses": {
+          "200": {
+            "description": "Key-value map of all UPS parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpsStatus"
+                },
+                "example": {
+                  "Model Name": "CP1500PFCLCD",
+                  "Firmware Number": "BFZE108.F5 .I",
+                  "Rating Voltage": "120 V",
+                  "Rating Power": "1000 Watt(900 VA)",
+                  "State": "Normal",
+                  "Power Supply by": "Utility Power",
+                  "Utility Voltage": "120 V",
+                  "Output Voltage": "120 V",
+                  "Battery Capacity": "100 %",
+                  "Remaining Runtime": "60 min.",
+                  "Load": "180 Watt(18 %)",
+                  "Line Interaction": "None",
+                  "Test Result": "Unknown",
+                  "Last Power Event": "None"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (60 requests per minute per IP)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Rate limit exceeded: 60 per 1 minute"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPS service unavailable — pwrstat binary missing, returned a non-zero exit code, timed out, or reported no data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "binary_missing": {
+                    "summary": "Binary not found",
+                    "value": { "detail": "UPS service unavailable" }
+                  },
+                  "timeout": {
+                    "summary": "Command timed out",
+                    "value": { "detail": "UPS service timed out" }
+                  },
+                  "no_data": {
+                    "summary": "No data returned",
+                    "value": { "detail": "No UPS data available" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "detail": "Internal server error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UpsStatus": {
+        "type": "object",
+        "description": "All key-value pairs from `pwrstat -status` output. Keys correspond to the field labels reported by pwrstat and may vary between UPS models and firmware versions.",
+        "additionalProperties": {
+          "type": "string"
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["detail"],
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Human-readable error message"
+          }
+        }
+      }
+    }
+  }
+}

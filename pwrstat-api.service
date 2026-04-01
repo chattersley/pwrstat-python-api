@@ -1,0 +1,30 @@
+[Unit]
+Description=pwrstat REST API
+Documentation=https://github.com/your-org/pwrstat-python-api
+After=network.target pwrstatd.service
+Wants=pwrstatd.service
+
+[Service]
+Type=simple
+User=pwrstat-api
+Group=pwrstat-api
+
+ExecStart=/opt/pwrstat-api/.venv/bin/pwrstat-api
+Restart=on-failure
+RestartSec=5
+
+# Configuration — override in /etc/systemd/system/pwrstat-api.service.d/local.conf
+Environment=PORT=5002
+Environment=HOST=0.0.0.0
+Environment=LOG_LEVEL=info
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+# pwrstat communicates with pwrstatd via a socket — no direct device access needed
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target
