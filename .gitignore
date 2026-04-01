@@ -42,3 +42,6 @@ htmlcov/
 # Build tools
 .ruff_cache/
 .mypy_cache/
+
+# Local history
+.history/

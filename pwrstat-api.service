@@ -1,6 +1,6 @@
 [Unit]
 Description=pwrstat REST API
-Documentation=https://github.com/your-org/pwrstat-python-api
+Documentation=https://github.com/chattersley/pwrstat-python-api
 After=network.target pwrstatd.service
 Wants=pwrstatd.service
 
